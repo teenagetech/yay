@@ -38,6 +38,8 @@
       max-width: 600px;
       text-align: center;
       color: #fff;
+      margin-top: 30px;
+      margin-bottom: 30px;
     }
 
     h1 {
@@ -99,6 +101,7 @@
       opacity: 0;
       transition: opacity 0.5s ease;
       pointer-events: none;
+      cursor: default;
     }
 
     .custom-alert.visible {
@@ -114,6 +117,17 @@
       background: rgba(255, 255, 255, 0.3);
       color: #fff;
       cursor: pointer;
+    }
+
+    .custom-alert button:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      transition: background-color 0.1s ease-in-out;
+    }
+
+    .custom-alert button:active {
+      transform: scale(0.95);
+      transition: transform 0.1s ease-in-out;
+      transition: background-color 0.1s ease-in-out;
     }
 
     #chartContainer {
@@ -174,11 +188,11 @@
     <img src="yay.svg" alt="yay Logo" width="100"
       style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;">
     <div id="price">
-      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg"> <span
-        id="currentPrice">100</span>
+      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg"> <span id="currentPrice">100</span>
     </div>
     <div id="balance">
-      Your Balance: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> <span id="userBalance">0</span> | Shares: <span id="userShares">0</span>
+      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> <span id="userBalance">0</span> |
+      Shares: <span id="userShares">0</span>
     </div>
     <div>
       <button id="buyBtn" class="action-button buy">Buy</button>
@@ -215,9 +229,11 @@
       datasets: [{
         label: 'yay Price',
         data: [],
-        fill: false,
+        fill: true,
         borderColor: '#00ffff',
-        tension: 0.1
+        backgroundColor: 'rgba(0, 255, 255, 0.1)',
+        tension: 0.1,
+        pointRadius: 3
       }]
     };
     const priceChart = new Chart(ctx, {
@@ -232,42 +248,80 @@
       }
     });
     function showAlert(message, showMeaning, message2) {
-  const alertMessage = document.getElementById('alertMessage');
-  if (showMeaning) {
-    alertMessage.innerHTML = message + '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> ' + message2;
-  }
-  else {
-    alertMessage.innerText = message;
-  }
-  const alertEl = document.getElementById('customAlert');
-  alertEl.classList.add('visible');
-}
+      const alertMessage = document.getElementById('alertMessage');
+      if (showMeaning) {
+        alertMessage.innerHTML = message + '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> ' + message2;
+      }
+      else {
+        alertMessage.innerText = message;
+      }
+      const alertEl = document.getElementById('customAlert');
+      alertEl.classList.add('visible');
+    }
 
     document.getElementById('alertCloseBtn').addEventListener('click', () => {
       document.getElementById('customAlert').classList.remove('visible');
     });
+    let lastPrice = currentPrice;  // Store the previous price for comparison
+
     function updateButtonSaturation() {
-      if (currentPrice > 100) {
-        document.getElementById('sellBtn').style.filter = 'saturate(250%)';
-        document.getElementById('buyBtn').style.filter = 'saturate(30%)';
-      } else if (currentPrice < 100) {
-        document.getElementById('buyBtn').style.filter = 'saturate(250%)';
-        document.getElementById('sellBtn').style.filter = 'saturate(30%)';
-      } else {
-        document.getElementById('buyBtn').style.filter = 'saturate(100%)';
-        document.getElementById('sellBtn').style.filter = 'saturate(100%)';
-      }
-      if (userBalance < currentPrice) {
-        document.getElementById('buyBtn').classList.add('disabled');
-      } else {
-        document.getElementById('buyBtn').classList.remove('disabled');
-      }
-      if (userShares <= 0) {
-        document.getElementById('sellBtn').classList.add('disabled');
-      } else {
-        document.getElementById('sellBtn').classList.remove('disabled');
-      }
-    }
+  // Compute a moving average of the last 5 price readouts (or fallback to currentPrice)
+  let basePrice;
+  const recentPrices = chartData.datasets[0].data;
+  if (recentPrices.length >= 5) {
+    basePrice = recentPrices.slice(-5).reduce((sum, p) => sum + p, 0) / 5;
+  } else {
+    basePrice = currentPrice;
+  }
+
+  const priceDiff = currentPrice - basePrice;
+
+  // Clamp the price difference to between -30 and 30
+  const clampedDiff = Math.max(-30, Math.min(30, priceDiff));
+
+  // Scale the clamped difference to an adjustment factor
+  // For example, a difference of 30 corresponds to a 50% change in saturation.
+  const adjustment = (clampedDiff / 30) * 50; // value between -50 and +50
+
+  let buySaturation, sellSaturation;
+  if (priceDiff < 0) {
+    // Price is lower than recent average – buying is recommended:
+    // Increase saturation of the buy button and decrease for sell.
+    buySaturation = 100 + Math.abs(adjustment);
+    sellSaturation = 100 - Math.abs(adjustment);
+  } else {
+    // Price is higher than recent average – selling is recommended:
+    // Increase saturation of the sell button and decrease for buy.
+    sellSaturation = 100 + adjustment;
+    buySaturation = 100 - adjustment;
+  }
+
+  // Ensure that saturation never drops below 30% (to avoid a “washed-out” look)
+  buySaturation = Math.max(30, buySaturation);
+  sellSaturation = Math.max(30, sellSaturation);
+
+  // Set the CSS filter property using a template literal so that the computed percentage is inserted
+  document.getElementById('buyBtn').style.filter = `saturate(${buySaturation}%)`;
+  document.getElementById('sellBtn').style.filter = `saturate(${sellSaturation}%)`;
+
+  // Update the disabled state of the buttons as before
+  if (userBalance < currentPrice) {
+    document.getElementById('buyBtn').classList.add('disabled');
+  } else {
+    document.getElementById('buyBtn').classList.remove('disabled');
+  }
+
+  if (userShares <= 0) {
+    document.getElementById('sellBtn').classList.add('disabled');
+  } else {
+    document.getElementById('sellBtn').classList.remove('disabled');
+  }
+}
+
+
+
+
+
     function updateUI() {
       document.getElementById('currentPrice').innerText = currentPrice.toFixed(2);
       document.getElementById('userBalance').innerText = userBalance.toFixed(2);
