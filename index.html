@@ -6,9 +6,12 @@
   <title>yay: meaningless crypto</title>
   <link rel="icon" href="favicon.png" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <!-- Firebase scripts (modular) -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,38 +52,22 @@
 
     #chartjs-tooltip {
       background: rgba(255, 255, 255, 0.15);
-      /* Glass-like background */
       border-radius: 10px;
-      /* Rounded corners */
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      /* Shadow for depth */
       backdrop-filter: blur(10px);
-      /* Glass blur effect */
       -webkit-backdrop-filter: blur(10px);
-      /* Safari support */
       border: 1px solid rgba(255, 255, 255, 0.3);
-      /* Light border */
       padding: 10px;
-      /* Some space inside the tooltip */
       color: #fff;
       min-width: 140px;
-      /* Text color */
       font-size: 14px;
-      /* Font size for tooltip */
       position: absolute;
-      /* Position relative to the chart */
       pointer-events: none;
-      /* Disable pointer events */
       opacity: 0;
-      /* Start with hidden tooltip */
       transition: opacity 0.1s ease, transform 0.1s ease;
-      /* Smooth transition */
       transform: translate(-50%, -50%);
-      /* Center the tooltip */
       z-index: 100;
-      /* Ensure the tooltip is above other elements */
     }
-
 
     h1 {
       margin-bottom: 1rem;
@@ -225,17 +212,14 @@
 
 <body draggable="false">
   <div class="glass-container">
-    <img src="yay.svg" alt="yay Logo" width="100"
-      style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;"
-      draggable="false">
+    <img src="yay.svg" alt="yay Logo" width="100" draggable="false">
     <div id="price">
-      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false"> <span
-        id="currentPrice" draggable="false">100</span>
+      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false">
+      <span id="currentPrice" draggable="false">100</span>
     </div>
     <div id="balance">
-      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> <span
-        id="userBalance">0</span> |
-      Shares: <span id="userShares">0</span>
+      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false">
+      <span id="userBalance">0</span> | Shares: <span id="userShares">0</span>
     </div>
     <div>
       <button id="buyBtn" class="action-button buy">Buy</button>
@@ -252,96 +236,106 @@
     <p id="alertMessage"></p>
     <button id="alertCloseBtn">OK</button>
   </div>
-  <script>
+
+  <script type="module">
+    // Import required functions from the modular Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
+    import {
+      getDatabase,
+      ref,
+      onValue,
+      set,
+      push,
+      remove,
+      get,
+      runTransaction,
+      onDisconnect
+    } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyAiaR6mgdPmEJoB2bGrKMKqZ1IhGcqNpHw",
       authDomain: "yay-cryptocurrency.firebaseapp.com",
       databaseURL: "https://yay-cryptocurrency-default-rtdb.firebaseio.com",
       projectId: "yay-cryptocurrency",
       storageBucket: "yay-cryptocurrency.firebasestorage.app",
-      messagingSenderId: "Y462460388463",
-      appId: "1:462460388463:web:40b65a6c7b1d4f9aacb99a"
+      messagingSenderId: "462460388463",
+      appId: "1:462460388463:web:40b65a6c7b1d4f9aacb99a",
+      measurementId: "G-JKZTHG965Q"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
     let currentPrice = 100;
     let userBalance = 1000;
     let userShares = 0;
     let uid = null;
+    const connectedRef = ref(db, ".info/connected");
+    onValue(connectedRef, (snap) => {
+      if (!snap.val()) return;
+      const conRef = push(ref(db, "activeUsers"));
+      set(conRef, true);
+      onDisconnect(conRef).remove();
+    });
+    onValue(ref(db, "activeUsers"), (snapshot) => {
+      const numActiveUsers = snapshot.exists()
+        ? Object.keys(snapshot.val() || {}).length
+        : 0;
+      document.getElementById("activeUsersCount").innerText = numActiveUsers;
+    });
     const externalTooltipHandler = (context) => {
-      let tooltipEl = document.getElementById('chartjs-tooltip');
+      let tooltipEl = document.getElementById("chartjs-tooltip");
       if (!tooltipEl) {
-        tooltipEl = document.createElement('div');
-        tooltipEl.id = 'chartjs-tooltip';
+        tooltipEl = document.createElement("div");
+        tooltipEl.id = "chartjs-tooltip";
         document.body.appendChild(tooltipEl);
       }
 
       const tooltipModel = context.tooltip;
 
-      // Hide if no tooltip
       if (tooltipModel.opacity === 0) {
         tooltipEl.style.opacity = 0;
         return;
       }
 
-      // Build the custom HTML content
       let innerHtml = `<div style="display: flex; align-items: center;">
-      <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right:5px; filter: hue-rotate(120deg) invert(1);" draggable="false">
-      <div>`;
+            <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right: 3px; margin-top: 5px;">
+            <div>`;
       if (tooltipModel.body) {
-        tooltipModel.body.forEach(bodyItem => {
-          innerHtml += `<div>${bodyItem.lines.join(' ')}</div>`;
+        tooltipModel.body.forEach((bodyItem) => {
+          innerHtml += `<div>${bodyItem.lines.join(" ")}</div>`;
         });
       }
       innerHtml += `</div></div>`;
       tooltipEl.innerHTML = innerHtml;
 
-      // Position the tooltip based on the caretX and caretY values
       const canvasRect = context.chart.canvas.getBoundingClientRect();
-
       tooltipEl.style.opacity = 1;
-      tooltipEl.style.left = canvasRect.left + window.pageXOffset + tooltipModel.caretX + 85 + 'px';
-      tooltipEl.style.top = canvasRect.top + window.pageYOffset + tooltipModel.caretY + 25 + 'px';
+      tooltipEl.style.left = canvasRect.left + window.pageXOffset + tooltipModel.caretX + 85 + "px";
+      tooltipEl.style.top = canvasRect.top + window.pageYOffset + tooltipModel.caretY + 25 + "px";
     };
 
-
-    // Set up presence management
-    const connectedRef = db.ref(".info/connected");
-    connectedRef.on("value", (snap) => {
-      if (snap.val() === false) {
-        // The client is not connected to Firebase.
-        return;
-      }
-      // When connected, push a new entry to "activeUsers"
-      const conRef = db.ref("activeUsers").push();
-      // You can store additional data if needed; here we simply set it to true.
-      conRef.set(true);
-      // Ensure that when the client disconnects, this entry is removed.
-      conRef.onDisconnect().remove();
-    });
-
-    // Listen for changes on the "activeUsers" node and update the UI
-    db.ref("activeUsers").on("value", (snapshot) => {
-      const numActiveUsers = snapshot.numChildren();
-      document.getElementById("activeUsersCount").innerText = numActiveUsers;
-    });
-
-    const ctx = document.getElementById('priceChart').getContext('2d');
+    const ctx = document.getElementById("priceChart").getContext("2d");
     let chartData = {
       labels: [],
-      datasets: [{
-        label: 'price',
-        data: [],
-        fill: true,
-        borderColor: '#00ffff',
-        backgroundColor: 'rgba(0, 255, 255, 0.1)',
-        tension: 0.1,
-        pointRadius: 3
-      }]
+      datasets: [
+        {
+          label: "price",
+          data: [],
+          fill: true,
+          borderColor: "#00ffff",
+          backgroundColor: "rgba(0, 255, 255, 0.1)",
+          tension: 0.1,
+          pointRadius: 3
+        }
+      ]
     };
+
     const priceChart = new Chart(ctx, {
-      type: 'line',
+      type: "line",
       data: chartData,
       options: {
         responsive: true,
@@ -358,32 +352,14 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            enabled: false,         // Disable the default tooltip
-            external: externalTooltipHandler  // Use your custom tooltip handler
+            enabled: false,
+            external: externalTooltipHandler
           }
         }
       }
     });
 
-    function showAlert(message, showMeaning, message2) {
-      const alertMessage = document.getElementById('alertMessage');
-      if (showMeaning) {
-        alertMessage.innerHTML = message + '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> ' + message2;
-      }
-      else {
-        alertMessage.innerText = message;
-      }
-      const alertEl = document.getElementById('customAlert');
-      alertEl.classList.add('visible');
-    }
-
-    document.getElementById('alertCloseBtn').addEventListener('click', () => {
-      document.getElementById('customAlert').classList.remove('visible');
-    });
-    let lastPrice = currentPrice;  // Store the previous price for comparison
-
     function updateButtonSaturation() {
-      // Compute a moving average of the last 5 price readouts (or fallback to currentPrice)
       let basePrice;
       const recentPrices = chartData.datasets[0].data;
       if (recentPrices.length >= 5) {
@@ -393,67 +369,51 @@
       }
 
       const priceDiff = currentPrice - basePrice;
-
-      // Clamp the price difference to between -30 and 30
       const clampedDiff = Math.max(-30, Math.min(30, priceDiff));
-
-      // Scale the clamped difference to an adjustment factor
-      // For example, a difference of 30 corresponds to a 50% change in saturation.
-      const adjustment = (clampedDiff / 30) * 50; // value between -50 and +50
-
+      const adjustment = (clampedDiff / 0.5) * 50;
       let buySaturation, sellSaturation;
       if (priceDiff < 0) {
-        // Price is lower than recent average – buying is recommended:
-        // Increase saturation of the buy button and decrease for sell.
         buySaturation = 100 + Math.abs(adjustment);
         sellSaturation = 100 - Math.abs(adjustment);
       } else {
-        // Price is higher than recent average – selling is recommended:
-        // Increase saturation of the sell button and decrease for buy.
-        sellSaturation = 100 + adjustment;
-        buySaturation = 100 - adjustment;
+        sellSaturation = 150 + adjustment;
+        buySaturation = 150 - adjustment;
       }
+      buySaturation = Math.max(50, buySaturation);
+      sellSaturation = Math.max(50, sellSaturation);
 
-      // Ensure that saturation never drops below 30% (to avoid a “washed-out” look)
-      buySaturation = Math.max(30, buySaturation);
-      sellSaturation = Math.max(30, sellSaturation);
+      document.getElementById("buyBtn").style.filter = `saturate(${buySaturation}%)`;
+      document.getElementById("sellBtn").style.filter = `saturate(${sellSaturation}%)`;
 
-      // Set the CSS filter property using a template literal so that the computed percentage is inserted
-      document.getElementById('buyBtn').style.filter = `saturate(${buySaturation}%)`;
-      document.getElementById('sellBtn').style.filter = `saturate(${sellSaturation}%)`;
-
-      // Update the disabled state of the buttons as before
       if (userBalance < currentPrice) {
-        document.getElementById('buyBtn').classList.add('disabled');
+        document.getElementById("buyBtn").classList.add("disabled");
       } else {
-        document.getElementById('buyBtn').classList.remove('disabled');
+        document.getElementById("buyBtn").classList.remove("disabled");
       }
 
       if (userShares <= 0) {
-        document.getElementById('sellBtn').classList.add('disabled');
+        document.getElementById("sellBtn").classList.add("disabled");
       } else {
-        document.getElementById('sellBtn').classList.remove('disabled');
+        document.getElementById("sellBtn").classList.remove("disabled");
       }
     }
-    function updateUI() {
-      document.getElementById('currentPrice').innerText = currentPrice.toFixed(2);
-      document.getElementById('userBalance').innerText = userBalance.toFixed(2);
-      document.getElementById('userShares').innerText = userShares;
-      updateButtonSaturation();
 
-      // Update the Y-axis bounds to be 60 above and below the current price
+    function updateUI() {
+      document.getElementById("currentPrice").innerText = currentPrice.toFixed(2);
+      document.getElementById("userBalance").innerText = userBalance.toFixed(2);
+      document.getElementById("userShares").innerText = userShares;
+      updateButtonSaturation();
       priceChart.options.scales.y.min = currentPrice - 7;
       priceChart.options.scales.y.max = currentPrice + 7;
-
-      // Update the chart to reflect the new Y-axis settings
       priceChart.update();
     }
-
     function logPriceHistory(price) {
       const timestamp = Date.now();
-      db.ref('yayHistory').push({ timestamp, price });
+      push(ref(db, "yayHistory"), { timestamp, price });
+
       chartData.labels.push(new Date(timestamp).toLocaleTimeString());
       chartData.datasets[0].data.push(price);
+
       if (chartData.labels.length > 20) {
         chartData.labels.shift();
         chartData.datasets[0].data.shift();
@@ -470,82 +430,133 @@
       }
       priceChart.update();
     }, 2000);
-    db.ref('yayPrice').on('value', snapshot => {
+    onValue(ref(db, "yayPrice"), (snapshot) => {
       const priceFromDB = snapshot.val();
       if (priceFromDB !== null) {
         currentPrice = priceFromDB;
         updateUI();
       }
     });
-    auth.signInAnonymously().then(cred => {
-      uid = cred.user.uid;
-      const userRef = db.ref('users/' + uid);
-      userRef.once('value', snapshot => {
-        if (!snapshot.exists()) {
-          userRef.set({ balance: userBalance, shares: 0 });
-        } else {
-          const userData = snapshot.val();
-          userBalance = userData.balance;
-          userShares = userData.shares;
-          updateUI();
-        }
+    signInAnonymously(auth)
+      .then((cred) => {
+        uid = cred.user.uid;
+        const userRef = ref(db, "users/" + uid);
+        get(userRef).then((snapshot) => {
+          if (!snapshot.exists()) {
+            set(userRef, { balance: 1000, shares: 0 });
+          } else {
+            const userData = snapshot.val();
+            userBalance = userData.balance;
+            userShares = userData.shares;
+            console.log("User data loaded:", userData);
+            updateUI();
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Auth Error: ", error);
       });
-    }).catch(error => {
-      console.error("Auth Error: ", error);
-    });
     function updateUserData() {
       if (uid) {
-        db.ref('users/' + uid).set({ balance: userBalance, shares: userShares });
-        updateUI();
+        const userRef = ref(db, "users/" + uid);
+        runTransaction(userRef, (userData) => {
+          if (userData === null) {
+            return { balance: userBalance, shares: userShares };
+          } else {
+            userData.balance = userBalance;
+            userData.shares = userShares;
+            return userData;
+          }
+        })
+          .then((result) => {
+            if (result.committed) {
+              console.log("User data updated successfully");
+            } else {
+              console.error("Error updating user data: Transaction not committed");
+            }
+            updateUI();
+          })
+          .catch((error) => {
+            console.error("Error updating user data:", error);
+            updateUI();
+          });
       }
     }
+
     function buyShare() {
       if (userBalance < currentPrice) {
-        showAlert("You don't have enough", true, "eaning to buy a share.");
+        showAlert("You don't have enough", true, "meaning to buy a share.");
         return;
       }
-      const priceRef = db.ref('yayPrice');
-      priceRef.transaction(current => {
+      const priceRef = ref(db, "yayPrice");
+      runTransaction(priceRef, (current) => {
         if (current === null) current = 100;
         return current * 1.005;
-      }, (error, committed, snapshot) => {
-        if (committed) {
-          userBalance -= currentPrice;
-          userShares += 1;
-          updateUserData();
-          currentPrice = snapshot.val();
-          updateUI();
-          logPriceHistory(currentPrice);
-        }
-      });
+      })
+        .then((result) => {
+          if (result.committed) {
+            userBalance -= currentPrice;
+            userShares += 1;
+            updateUserData();
+            currentPrice = result.snapshot.val();
+            updateUI();
+            logPriceHistory(currentPrice);
+          }
+        })
+        .catch((error) => {
+          console.error("Transaction failed:", error);
+        });
     }
+
     function sellShare() {
       if (userShares <= 0) {
         showAlert("You don't have any shares to sell.");
         return;
       }
-      const priceRef = db.ref('yayPrice');
-      priceRef.transaction(current => {
+      const priceRef = ref(db, "yayPrice");
+      runTransaction(priceRef, (current) => {
         if (current === null) current = 100;
-        return current * 0.995;
-      }, (error, committed, snapshot) => {
-        if (committed) {
-          userBalance += currentPrice;
-          userShares -= 1;
-          updateUserData();
-          currentPrice = snapshot.val();
-          updateUI();
-          logPriceHistory(currentPrice);
-        }
-      });
+        return current * 0.995; // Decrease price by 0.5%
+      })
+        .then((result) => {
+          if (result.committed) {
+            userBalance += currentPrice;
+            userShares -= 1;
+            updateUserData();
+            currentPrice = result.snapshot.val();
+            updateUI();
+            logPriceHistory(currentPrice);
+          }
+        })
+        .catch((error) => {
+          console.error("Transaction failed:", error);
+        });
     }
-    document.getElementById('buyBtn').addEventListener('click', buyShare);
-    document.getElementById('sellBtn').addEventListener('click', sellShare);
-    db.ref('yayPrice').once('value', snapshot => {
-      if (snapshot.val() === null) {
-        db.ref('yayPrice').set(100);
+    function showAlert(message, showMeaning, message2) {
+      const alertMessage = document.getElementById("alertMessage");
+      if (showMeaning) {
+        alertMessage.innerHTML =
+          message +
+          '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> ' +
+          message2;
+      } else {
+        alertMessage.innerText = message;
+      }
+      const alertEl = document.getElementById("customAlert");
+      alertEl.classList.add("visible");
+    }
+
+    document.getElementById("alertCloseBtn").addEventListener("click", () => {
+      document.getElementById("customAlert").classList.remove("visible");
+    });
+    get(ref(db, "yayPrice")).then((snapshot) => {
+      if (!snapshot.exists()) {
+        set(ref(db, "yayPrice"), 100);
       }
     });
+    document.getElementById("buyBtn").addEventListener("click", buyShare);
+    document.getElementById("sellBtn").addEventListener("click", sellShare);
+
   </script>
 </body>
 
