@@ -10,6 +10,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -23,7 +26,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: sans-serif;
+      font-family: "Rubik", sans-serif !important;
     }
 
     .glass-container {
@@ -218,15 +221,15 @@
   </style>
 </head>
 
-<body>
+<body draggable="false">
   <div class="glass-container">
     <img src="yay.svg" alt="yay Logo" width="100"
-      style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;">
+      style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;" draggable="false">
     <div id="price">
-      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg"> <span id="currentPrice">100</span>
+      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false"> <span id="currentPrice" draggable="false">100</span>
     </div>
     <div id="balance">
-      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> <span id="userBalance">0</span> |
+      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> <span id="userBalance">0</span> |
       Shares: <span id="userShares">0</span>
     </div>
     <div>
@@ -276,7 +279,7 @@
 
       // Build the custom HTML content
       let innerHtml = `<div style="display: flex; align-items: center;">
-      <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right:5px; filter: hue-rotate(120deg) invert(1);">
+      <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right:5px; filter: hue-rotate(120deg) invert(1);" draggable="false">
       <div>`;
       if (tooltipModel.body) {
         tooltipModel.body.forEach(bodyItem => {
@@ -337,7 +340,7 @@
     function showAlert(message, showMeaning, message2) {
       const alertMessage = document.getElementById('alertMessage');
       if (showMeaning) {
-        alertMessage.innerHTML = message + '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm"> ' + message2;
+        alertMessage.innerHTML = message + '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> ' + message2;
       }
       else {
         alertMessage.innerText = message;
