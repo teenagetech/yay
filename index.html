@@ -11,8 +11,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -224,12 +226,15 @@
 <body draggable="false">
   <div class="glass-container">
     <img src="yay.svg" alt="yay Logo" width="100"
-      style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;" draggable="false">
+      style="filter: hue-rotate(120deg) invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.7;"
+      draggable="false">
     <div id="price">
-      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false"> <span id="currentPrice" draggable="false">100</span>
+      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false"> <span
+        id="currentPrice" draggable="false">100</span>
     </div>
     <div id="balance">
-      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> <span id="userBalance">0</span> |
+      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> <span
+        id="userBalance">0</span> |
       Shares: <span id="userShares">0</span>
     </div>
     <div>
@@ -238,6 +243,9 @@
     </div>
     <div id="chartContainer">
       <canvas id="priceChart"></canvas>
+    </div>
+    <div style="text-align: center; color: #fff; margin-bottom: 1rem;">
+      Active Users: <span id="activeUsersCount">0</span>
     </div>
   </div>
   <div id="customAlert" class="custom-alert">
@@ -298,6 +306,26 @@
     };
 
 
+    // Set up presence management
+    const connectedRef = db.ref(".info/connected");
+    connectedRef.on("value", (snap) => {
+      if (snap.val() === false) {
+        // The client is not connected to Firebase.
+        return;
+      }
+      // When connected, push a new entry to "activeUsers"
+      const conRef = db.ref("activeUsers").push();
+      // You can store additional data if needed; here we simply set it to true.
+      conRef.set(true);
+      // Ensure that when the client disconnects, this entry is removed.
+      conRef.onDisconnect().remove();
+    });
+
+    // Listen for changes on the "activeUsers" node and update the UI
+    db.ref("activeUsers").on("value", (snapshot) => {
+      const numActiveUsers = snapshot.numChildren();
+      document.getElementById("activeUsersCount").innerText = numActiveUsers;
+    });
 
     const ctx = document.getElementById('priceChart').getContext('2d');
     let chartData = {
