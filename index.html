@@ -24,6 +24,27 @@
       font-family: "Rubik", sans-serif;
     }
 
+    .action-button {
+      transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
+    }
+
+    .action-button:hover {
+      filter: brightness(1.2);
+    }
+
+    .action-button:active {
+      transform: scale(0.95);
+      filter: brightness(1.1);
+    }
+
+    .action-button.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      transform: none;
+      filter: none;
+    }
+
+
 
     #accountBtn,
     .close-modal-btn {
@@ -298,7 +319,6 @@
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
-
     .buy {
       background: linear-gradient(135deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.1));
     }
@@ -433,7 +453,7 @@
   </style>
 </head>
 
-<body draggable="false">
+<body draggable="false" oncontextmenu="return false;">
   <div class="glass-container">
     <img src="yay.svg" alt="yay Logo" width="100" draggable="false" oncontextmenu="return false;">
     <div id="price">
@@ -457,7 +477,7 @@
       Active Users: <span id="activeUsersCount">0</span>
     </div>
     <button id="accountBtn">
-      <img src="account.svg" alt="Account" oncontextmenu="return false;">
+      <img src="account.svg" alt="Account" draggable="false" oncontextmenu="return false;">
     </button>
   </div>
   <div id="customAlert" class="custom-alert">
@@ -474,10 +494,11 @@
           <input type="text" id="currentUID" readonly contenteditable="false">
           <div class="icon-buttons">
             <button id="copyUIDBtn" class="icon-button" title="Copy UID">
-              <img src="copy.svg" alt="Copy" width="20" height="20" oncontextmenu="return false;">
+              <img src="copy.svg" alt="Copy" width="20" height="20" draggable="false" oncontextmenu="return false;">
             </button>
             <button id="downloadUIDBtn" class="icon-button" title="Download UID">
-              <img src="download.svg" alt="Download" width="20" height="20" oncontextmenu="return false;">
+              <img src="download.svg" alt="Download" width="20" height="20" draggable="false"
+                oncontextmenu="return false;">
             </button>
           </div>
         </div>
@@ -488,7 +509,7 @@
           <input type="text" id="loginUID" placeholder="Paste/type your User ID here">
           <div class="icon-buttons">
             <button id="loginBtn" class="icon-button" title="Login">
-              <img src="login.svg" alt="Copy" width="20" height="20">
+              <img src="login.svg" alt="Copy" width="20" height="20" draggable="false" oncontextmenu="return false;">
             </button>
           </div>
         </div>
@@ -497,7 +518,7 @@
         <button id="logoutBtn" class="action-button">Log Out</button>
       </div>
       <button id="closeAccountModalBtn" class="close-modal-btn">
-        <img src="close.svg" alt="Close" width="20" height="20" oncontextmenu="return false;">
+        <img src="close.svg" alt="Close" width="20" height="20" draggable="false" oncontextmenu="return false;">
       </button>
     </div>
   </div>
