@@ -6,12 +6,10 @@
   <title>yay: meaningless crypto</title>
   <link rel="icon" href="favicon.png" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Firebase scripts (modular) -->
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +21,44 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: "Rubik", sans-serif;
     }
+
+
+    #accountBtn,
+    .close-modal-btn {
+      position: relative;
+      z-index: 0;
+      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    #accountBtn::after,
+    .close-modal-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    #accountBtn:hover::after,
+    .close-modal-btn:hover::after {
+      opacity: 1;
+    }
+
+    #accountBtn img,
+    .close-modal-btn img {
+      position: relative;
+      z-index: 1;
+    }
+
 
     body {
       min-height: 100vh;
@@ -69,6 +104,140 @@
       z-index: 100;
     }
 
+    .account-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 7;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .account-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .account-modal-content {
+      background: linear-gradient(135deg, rgba(0, 200, 255, 0.2), rgba(0, 115, 255, 0.2));
+      border-radius: 20px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      color: #fff;
+      transform: translateY(-20px);
+      transition: transform 0.5s ease;
+    }
+
+    .account-modal.visible .account-modal-content {
+      transform: translateY(0);
+    }
+
+    .account-modal h2 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+
+    .account-modal input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin: 0.5rem 0;
+    }
+
+    .account-modal input[type="text"] {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: border-color 0.3s ease;
+    }
+
+    .account-modal input[type="text"]::placeholder {
+      color: #e0e0e0;
+    }
+
+    .account-modal input[type="text"]:hover,
+    .account-modal input[type="text"]:focus {
+      border-color: rgba(255, 255, 255, 0.7);
+      outline: none;
+    }
+
+    .account-modal input[type="text"]::after {
+      transition: border 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .account-modal .action-button {
+      border: none;
+      border-radius: 10px;
+      padding: 5px 20px;
+      font-size: 19px;
+      transition: filter 0.3s, opacity 0.3s;
+      margin: 0px 10px;
+      margin-top: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .account-modal input[type="text"]#currentUID {
+      padding-right: 56px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      margin: 0.5rem 0;
+      pointer-events: none;
+    }
+
+    .uid-field-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .uid-field-container input {
+      flex: 1;
+      padding-right: 60px;
+    }
+
+    .icon-buttons {
+      position: absolute;
+      right: 5px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .icon-button {
+      border: none;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+      background: none;
+      border-radius: 3px;
+      margin-top: 3px;
+    }
+
+    .icon-button:hover {
+      opacity: 1;
+    }
+
     h1 {
       margin-bottom: 1rem;
       font-size: 2rem;
@@ -86,7 +255,7 @@
     .action-button {
       border: none;
       border-radius: 10px;
-      padding: 1rem 2rem;
+      padding: 0.8rem 1.5rem;
       font-size: 1.2rem;
       color: #fff;
       cursor: pointer;
@@ -95,8 +264,40 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
       backdrop-filter: blur(5px);
+      font-family: "Rubik", sans-serif;
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
+
+    #accountBtn {
+      position: absolute;
+      transition: border 0.3s;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    #accountBtn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    #accountBtn:hover {
+      transition: border 0.3s;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
 
     .buy {
       background: linear-gradient(135deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.1));
@@ -122,7 +323,7 @@
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
       padding: 1rem 2rem;
-      z-index: 1000;
+      z-index: 8;
       text-align: center;
       color: #fff;
       opacity: 0;
@@ -184,6 +385,34 @@
       filter: hue-rotate(120deg) invert(1)
     }
 
+    .close-modal-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .close-modal-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .close-modal-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
     @media (max-width: 600px) {
       .glass-container {
         padding: 1rem;
@@ -197,12 +426,6 @@
         font-size: 2rem;
       }
 
-      .action-button {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
-        margin: 0.5rem;
-      }
-
       #priceChart {
         height: 200px !important;
       }
@@ -212,13 +435,15 @@
 
 <body draggable="false">
   <div class="glass-container">
-    <img src="yay.svg" alt="yay Logo" width="100" draggable="false">
+    <img src="yay.svg" alt="yay Logo" width="100" draggable="false" oncontextmenu="return false;">
     <div id="price">
-      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false">
+      Price: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-lg" draggable="false"
+        oncontextmenu="return false;">
       <span id="currentPrice" draggable="false">100</span>
     </div>
     <div id="balance">
-      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false">
+      You have: <img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"
+        oncontextmenu="return false;">
       <span id="userBalance">0</span> | Shares: <span id="userShares">0</span>
     </div>
     <div>
@@ -231,14 +456,58 @@
     <div style="text-align: center; color: #fff; margin-bottom: 1rem;">
       Active Users: <span id="activeUsersCount">0</span>
     </div>
+    <button id="accountBtn">
+      <img src="account.svg" alt="Account" oncontextmenu="return false;">
+    </button>
   </div>
   <div id="customAlert" class="custom-alert">
     <p id="alertMessage"></p>
     <button id="alertCloseBtn">OK</button>
   </div>
 
+  <div id="accountModal" class="account-modal">
+    <div class="account-modal-content">
+      <h2>Account Options</h2>
+      <div id="accountInfo">
+        <h3>Your User ID</h3>
+        <div class="uid-field-container">
+          <input type="text" id="currentUID" readonly contenteditable="false">
+          <div class="icon-buttons">
+            <button id="copyUIDBtn" class="icon-button" title="Copy UID">
+              <img src="copy.svg" alt="Copy" width="20" height="20" oncontextmenu="return false;">
+            </button>
+            <button id="downloadUIDBtn" class="icon-button" title="Download UID">
+              <img src="download.svg" alt="Download" width="20" height="20" oncontextmenu="return false;">
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="loginSection">
+        <h3>Log In</h3>
+        <div class="uid-field-container">
+          <input type="text" id="loginUID" placeholder="Paste/type your User ID here">
+          <div class="icon-buttons">
+            <button id="loginBtn" class="icon-button" title="Login">
+              <img src="login.svg" alt="Copy" width="20" height="20">
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="logoutSection">
+        <button id="logoutBtn" class="action-button">Log Out</button>
+      </div>
+      <button id="closeAccountModalBtn" class="close-modal-btn">
+        <img src="close.svg" alt="Close" width="20" height="20" oncontextmenu="return false;">
+      </button>
+    </div>
+  </div>
+
+  <div id="customAlert" class="custom-alert">
+    <p id="alertMessage"></p>
+    <button id="alertCloseBtn">OK</button>
+  </div>
+
   <script type="module">
-    // Import required functions from the modular Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-analytics.js";
     import {
@@ -252,7 +521,7 @@
       runTransaction,
       onDisconnect
     } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
+    import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAiaR6mgdPmEJoB2bGrKMKqZ1IhGcqNpHw",
@@ -273,6 +542,26 @@
     let userBalance = 1000;
     let userShares = 0;
     let uid = null;
+    let accountUID = null;
+
+    if (localStorage.getItem("accountUID")) {
+      accountUID = localStorage.getItem("accountUID");
+      console.log("Loaded accountUID from localStorage:", accountUID);
+    }
+    if (!accountUID) {
+      signInAnonymously(auth)
+        .then((cred) => {
+          accountUID = cred.user.uid;
+          console.log("Anonymous account created:", accountUID);
+          loadUserData();
+        })
+        .catch((error) => {
+          console.error("Auth Error:", error);
+        });
+    } else {
+      loadUserData();
+    }
+
     const connectedRef = ref(db, ".info/connected");
     onValue(connectedRef, (snap) => {
       if (!snap.val()) return;
@@ -303,9 +592,9 @@
       }
 
       let innerHtml = `<div style="display: flex; align-items: center;">
-        <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right: 3px; margin-top: 5px;">
+        <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right: 3px; margin-top: 5px;" oncontextmenu="return false;">
         <span style="margin-right: 5px;">value:</span>
-        <img src="meaning.svg" alt="meaning icon" style="width:16px; height:16px; margin-left: -2px; margin-right: -1px; margin-top: 2px;" class="meaning-icon-sm">
+        <img src="meaning.svg" alt="meaning icon" style="width:16px; height:16px; margin-left: -2px; margin-right: -1px; margin-top: 2px;" class="meaning-icon-sm" oncontextmenu="return false;">
         <span>${parseFloat(tooltipModel.dataPoints[0].raw).toFixed(2)}</span>
       </div>`;
 
@@ -380,11 +669,11 @@
       const adjustment = (clampedDiff / 0.5) * 50;
       let buySaturation, sellSaturation;
       if (priceDiff < 0) {
-        buySaturation = 100 + Math.abs(adjustment);
-        sellSaturation = 100 - Math.abs(adjustment);
+        buySaturation = 130 + Math.abs(adjustment);
+        sellSaturation = 130 - Math.abs(adjustment);
       } else {
-        sellSaturation = 150 + adjustment;
-        buySaturation = 150 - adjustment;
+        sellSaturation = 180 + adjustment;
+        buySaturation = 180 - adjustment;
       }
       buySaturation = Math.max(50, buySaturation);
       sellSaturation = Math.max(50, sellSaturation);
@@ -445,6 +734,7 @@
         updateUI();
       }
     });
+
     signInAnonymously(auth)
       .then((cred) => {
         uid = cred.user.uid;
@@ -464,9 +754,10 @@
       .catch((error) => {
         console.error("Auth Error: ", error);
       });
+
     function updateUserData() {
-      if (uid) {
-        const userRef = ref(db, "users/" + uid);
+      if (accountUID) {
+        const userRef = ref(db, "users/" + accountUID);
         runTransaction(userRef, (userData) => {
           if (userData === null) {
             return { balance: userBalance, shares: userShares };
@@ -480,7 +771,7 @@
             if (result.committed) {
               console.log("User data updated successfully");
             } else {
-              console.error("Error updating user data: Transaction not committed");
+              console.error("Transaction not committed");
             }
             updateUI();
           })
@@ -540,6 +831,7 @@
           console.error("Transaction failed:", error);
         });
     }
+
     function showAlert(message, showMeaning, message2) {
       const alertMessage = document.getElementById("alertMessage");
       if (showMeaning) {
@@ -562,8 +854,114 @@
         set(ref(db, "yayPrice"), 100);
       }
     });
+
     document.getElementById("buyBtn").addEventListener("click", buyShare);
     document.getElementById("sellBtn").addEventListener("click", sellShare);
+    function loadUserData() {
+      const userRef = ref(db, "users/" + accountUID);
+      get(userRef).then((snapshot) => {
+        if (!snapshot.exists()) {
+          set(userRef, { balance: 1000, shares: 0 });
+          userBalance = 1000;
+          userShares = 0;
+        } else {
+          const userData = snapshot.val();
+          userBalance = userData.balance;
+          userShares = userData.shares;
+        }
+        updateUI();
+      });
+    }
+    document.getElementById("copyUIDBtn").addEventListener("click", () => {
+      if (accountUID) {
+        navigator.clipboard.writeText(accountUID)
+          .then(() => {
+            showAlert("User ID copied to clipboard.", false);
+          })
+          .catch((error) => {
+            console.error("Copy failed:", error);
+          });
+      }
+    });
+
+    document.getElementById("downloadUIDBtn").addEventListener("click", () => {
+      if (accountUID) {
+        const blob = new Blob([accountUID], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "yay User ID.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    function login() {
+      const pastedUID = document.getElementById("loginUID").value.trim();
+      if (!pastedUID) {
+        showAlert("Hey! It doesn't look like you've entered a User ID.", false);
+        return;
+      }
+      get(ref(db, "users/" + pastedUID))
+        .then((snapshot) => {
+          if (!snapshot.exists()) {
+            showAlert("That User ID doesn't exist. Try double-checking it.", false);
+          } else {
+            accountUID = pastedUID;
+            localStorage.setItem("accountUID", accountUID);
+            loadUserData();
+            hideAccountModal();
+          }
+        })
+        .catch((error) => {
+          console.error("Error checking UID:", error);
+        });
+    }
+
+    document.getElementById("loginUID").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        login();
+      }
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      login();
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("accountUID");
+      accountUID = null;
+      signOut(auth)
+        .then(() => {
+          return signInAnonymously(auth);
+        })
+        .then((cred) => {
+          accountUID = cred.user.uid;
+          loadUserData();
+          hideAccountModal();
+        })
+        .catch((error) => {
+          console.error("Sign out error:", error);
+        });
+    });
+
+    function showAccountModal() {
+      const modal = document.getElementById("accountModal");
+      modal.classList.add("visible");
+      if (accountUID) {
+        document.getElementById("currentUID").value = accountUID;
+      } else {
+        document.getElementById("currentUID").value = "";
+      }
+    }
+
+    function hideAccountModal() {
+      const modal = document.getElementById("accountModal");
+      modal.classList.remove("visible");
+    }
+
+    document.getElementById("accountBtn").addEventListener("click", showAccountModal);
+    document.getElementById("closeAccountModalBtn").addEventListener("click", hideAccountModal);
 
   </script>
 </body>
