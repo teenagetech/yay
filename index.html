@@ -286,6 +286,7 @@
         : 0;
       document.getElementById("activeUsersCount").innerText = numActiveUsers;
     });
+
     const externalTooltipHandler = (context) => {
       let tooltipEl = document.getElementById("chartjs-tooltip");
       if (!tooltipEl) {
@@ -302,14 +303,12 @@
       }
 
       let innerHtml = `<div style="display: flex; align-items: center;">
-            <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right: 3px; margin-top: 5px;">
-            <div>`;
-      if (tooltipModel.body) {
-        tooltipModel.body.forEach((bodyItem) => {
-          innerHtml += `<div>${bodyItem.lines.join(" ")}</div>`;
-        });
-      }
-      innerHtml += `</div></div>`;
+        <img src="yay.svg" alt="yay logo" style="width:20px; height:20px; margin-right: 3px; margin-top: 5px;">
+        <span style="margin-right: 5px;">value:</span>
+        <img src="meaning.svg" alt="meaning icon" style="width:20px; height:20px; margin-left: -2px; margin-right: -1px;" class="meaning-icon-sm">
+        <span>${parseFloat(tooltipModel.dataPoints[0].raw).toFixed(2)}</span>
+      </div>`;
+
       tooltipEl.innerHTML = innerHtml;
 
       const canvasRect = context.chart.canvas.getBoundingClientRect();
@@ -318,18 +317,20 @@
       tooltipEl.style.top = canvasRect.top + window.pageYOffset + tooltipModel.caretY + 25 + "px";
     };
 
+
     const ctx = document.getElementById("priceChart").getContext("2d");
     let chartData = {
       labels: [],
       datasets: [
         {
-          label: "price",
+          label: "value",
           data: [],
           fill: true,
           borderColor: "#00ffff",
           backgroundColor: "rgba(0, 255, 255, 0.1)",
-          tension: 0.1,
-          pointRadius: 3
+          tension: 0.2,
+          pointRadius: 2,
+          pointHoverRadius: 5
         }
       ]
     };
@@ -343,9 +344,14 @@
         scales: {
           x: { display: false },
           y: {
-            min: currentPrice - 7,
-            max: currentPrice + 7,
-            ticks: { stepSize: 2 }
+            min: Math.floor(currentPrice - 7),
+            max: Math.ceil(currentPrice + 7),
+            ticks: {
+              stepSize: 2,
+              callback: function (value) {
+                return Math.round(value);
+              }
+            }
           }
         },
         animation: false,
@@ -358,6 +364,7 @@
         }
       }
     });
+
 
     function updateButtonSaturation() {
       let basePrice;
@@ -401,12 +408,13 @@
     function updateUI() {
       document.getElementById("currentPrice").innerText = currentPrice.toFixed(2);
       document.getElementById("userBalance").innerText = userBalance.toFixed(2);
-      document.getElementById("userShares").innerText = userShares;
+      document.getElementById("userShares").innerText = Math.round(userShares); // Ensure shares are whole numbers
       updateButtonSaturation();
       priceChart.options.scales.y.min = currentPrice - 7;
       priceChart.options.scales.y.max = currentPrice + 7;
       priceChart.update();
     }
+
     function logPriceHistory(price) {
       const timestamp = Date.now();
       push(ref(db, "yayHistory"), { timestamp, price });
@@ -485,7 +493,7 @@
 
     function buyShare() {
       if (userBalance < currentPrice) {
-        showAlert("You don't have enough", true, "meaning to buy a share.");
+        showAlert("You don't have enough", true, "eaning to buy a share.");
         return;
       }
       const priceRef = ref(db, "yayPrice");
@@ -516,7 +524,7 @@
       const priceRef = ref(db, "yayPrice");
       runTransaction(priceRef, (current) => {
         if (current === null) current = 100;
-        return current * 0.995; // Decrease price by 0.5%
+        return current * 0.995;
       })
         .then((result) => {
           if (result.committed) {
@@ -537,7 +545,7 @@
       if (showMeaning) {
         alertMessage.innerHTML =
           message +
-          '<img src="meaning.svg" alt="Meaning Icon" class="meaning-icon-sm" draggable="false"> ' +
+          '<img src="meaning.svg" alt="m" class="meaning-icon-sm" draggable="false"> ' +
           message2;
       } else {
         alertMessage.innerText = message;
