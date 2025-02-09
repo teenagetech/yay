@@ -31,20 +31,15 @@
 
     .action-button {
       transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
-    }
-
-    .action-button:hover {
-      filter: brightness(1.2);
+      -webkit-transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
     }
 
     .action-button:active {
       transform: scale(0.95);
-      filter: brightness(1.1);
     }
 
     .action-button.disabled {
       opacity: 0.5;
-      pointer-events: none;
       transform: none;
       filter: none;
     }
@@ -53,7 +48,7 @@
     .close-modal-btn {
       position: relative;
       z-index: 0;
-      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
@@ -302,7 +297,6 @@
       border-radius: 50%;
       background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -322,12 +316,18 @@
     }
 
     .buy {
-      background: linear-gradient(135deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.1));
+      background: -webkit-linear-gradient(135deg, rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.3));
+      background: linear-gradient(135deg, rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0.3));
+      background-blend-mode: overlay;
     }
 
+
     .sell {
-      background: linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1));
+      background: -webkit-linear-gradient(135deg, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.3));
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.3));
+      transform: translateZ(0);
     }
+
 
     .disabled {
       opacity: 0.5;
@@ -437,19 +437,19 @@
 
     @media (max-width: 600px) {
       .glass-container {
-      padding: 16px;
+        padding: 16px;
       }
 
       h1 {
-      font-size: 24px;
+        font-size: 24px;
       }
 
       #price {
-      font-size: 32px;
+        font-size: 32px;
       }
 
       #priceChart {
-      height: 200px !important;
+        height: 200px !important;
       }
     }
   </style>
@@ -481,10 +481,6 @@
     <button id="accountBtn">
       <img src="account.svg" alt="Account" draggable="false" oncontextmenu="return false;">
     </button>
-  </div>
-  <div id="customAlert" class="custom-alert">
-    <p id="alertMessage"></p>
-    <button id="alertCloseBtn">OK</button>
   </div>
 
   <div id="accountModal" class="account-modal">
@@ -689,33 +685,43 @@
 
       const priceDiff = currentPrice - basePrice;
       const clampedDiff = Math.max(-30, Math.min(30, priceDiff));
-      const adjustment = (clampedDiff / 0.5) * 50;
+      const adjustment = (clampedDiff / 30) * 50; // value between -50 and +50
       let buySaturation, sellSaturation;
       if (priceDiff < 0) {
-        buySaturation = 130 + Math.abs(adjustment);
-        sellSaturation = 130 - Math.abs(adjustment);
+        buySaturation = 100 + Math.abs(adjustment);
+        sellSaturation = 100 - Math.abs(adjustment);
       } else {
-        sellSaturation = 180 + adjustment;
-        buySaturation = 180 - adjustment;
+        sellSaturation = 100 + adjustment;
+        buySaturation = 100 - adjustment;
       }
       buySaturation = Math.max(50, buySaturation);
       sellSaturation = Math.max(50, sellSaturation);
 
-      document.getElementById("buyBtn").style.filter = `saturate(${buySaturation}%)`;
-      document.getElementById("sellBtn").style.filter = `saturate(${sellSaturation}%)`;
+      const buyFilterValue = `saturate(${buySaturation}%)`;
+      const sellFilterValue = `saturate(${sellSaturation}%)`;
+      const buyBtn = document.getElementById("buyBtn");
+      const sellBtn = document.getElementById("sellBtn");
+      buyBtn.style.filter = buyFilterValue;
+      buyBtn.style.webkitFilter = buyFilterValue;
+      sellBtn.style.filter = sellFilterValue;
+      sellBtn.style.webkitFilter = sellFilterValue;
+
+      buyBtn.style.transform = "translateZ(0)";
+      sellBtn.style.transform = "translateZ(0)";
 
       if (userBalance < currentPrice) {
-        document.getElementById("buyBtn").classList.add("disabled");
+        buyBtn.classList.add("disabled");
       } else {
-        document.getElementById("buyBtn").classList.remove("disabled");
+        buyBtn.classList.remove("disabled");
       }
 
       if (userShares <= 0) {
-        document.getElementById("sellBtn").classList.add("disabled");
+        sellBtn.classList.add("disabled");
       } else {
-        document.getElementById("sellBtn").classList.remove("disabled");
+        sellBtn.classList.remove("disabled");
       }
     }
+
 
     function updateUI() {
       document.getElementById("currentPrice").innerText = currentPrice.toFixed(2);
