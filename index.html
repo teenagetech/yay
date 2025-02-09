@@ -4,7 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <title>yay: meaningless crypto</title>
-  <link rel="icon" href="favicon.png" type="image/x-icon">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="yay: crypto">
+  <link rel="manifest" href="/site.webmanifest">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js"></script>
@@ -44,8 +49,6 @@
       filter: none;
     }
 
-
-
     #accountBtn,
     .close-modal-btn {
       position: relative;
@@ -80,7 +83,6 @@
       z-index: 1;
     }
 
-
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #00c6ff, #0072ff);
@@ -97,7 +99,7 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 2rem;
+      padding: 32px;
       width: 90%;
       max-width: 600px;
       text-align: center;
@@ -153,7 +155,7 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 2rem;
+      padding: 32px;
       max-width: 400px;
       width: 90%;
       text-align: center;
@@ -167,18 +169,18 @@
     }
 
     .account-modal h2 {
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
+      margin-bottom: 16px;
+      font-size: 28.8px;
     }
 
     .account-modal input[type="text"] {
       width: 100%;
-      padding: 0.5rem;
+      padding: 8px;
       border-radius: 5px;
       border: 1px solid rgba(255, 255, 255, 0.3);
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      margin: 0.5rem 0;
+      margin: 8px 0;
     }
 
     .account-modal input[type="text"] {
@@ -204,11 +206,11 @@
     .account-modal .action-button {
       border: none;
       border-radius: 10px;
-      padding: 5px 20px;
-      font-size: 19px;
+      padding: 4px 16px;
+      font-size: 22px;
       transition: filter 0.3s, opacity 0.3s;
-      margin: 0px 10px;
-      margin-top: 15px;
+      margin: 0px 16px;
+      margin-top: 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -220,7 +222,7 @@
       border: 1px solid rgba(255, 255, 255, 0.3);
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      margin: 0.5rem 0;
+      margin: 8px 0;
       pointer-events: none;
     }
 
@@ -228,7 +230,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 16px;
     }
 
     .uid-field-container input {
@@ -260,28 +262,28 @@
     }
 
     h1 {
-      margin-bottom: 1rem;
-      font-size: 2rem;
+      margin-bottom: 16px;
+      font-size: 32px;
     }
 
     #price {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      font-size: 40px;
+      margin-bottom: 16px;
     }
 
     #balance {
-      margin-bottom: 1rem;
+      margin-bottom: 16px;
     }
 
     .action-button {
       border: none;
       border-radius: 10px;
-      padding: 0.8rem 1.5rem;
-      font-size: 1.2rem;
+      padding: 12.8px 24px;
+      font-size: 19.2px;
       color: #fff;
       cursor: pointer;
       transition: filter 0.3s, opacity 0.3s;
-      margin: 0 1rem;
+      margin: 0 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
       backdrop-filter: blur(5px);
@@ -342,7 +344,7 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 1rem 2rem;
+      padding: 16px 32px;
       z-index: 8;
       text-align: center;
       color: #fff;
@@ -358,8 +360,8 @@
     }
 
     .custom-alert button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      margin-top: 16px;
+      padding: 8px 16px;
       border: none;
       border-radius: 5px;
       background: rgba(255, 255, 255, 0.3);
@@ -379,7 +381,7 @@
     }
 
     #chartContainer {
-      margin: 2rem 0;
+      margin: 32px 0;
     }
 
     #priceChart {
@@ -435,19 +437,19 @@
 
     @media (max-width: 600px) {
       .glass-container {
-        padding: 1rem;
+      padding: 16px;
       }
 
       h1 {
-        font-size: 1.5rem;
+      font-size: 24px;
       }
 
       #price {
-        font-size: 2rem;
+      font-size: 32px;
       }
 
       #priceChart {
-        height: 200px !important;
+      height: 200px !important;
       }
     }
   </style>
