@@ -34,10 +34,11 @@
       -webkit-transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
     }
 
-    .action-button:active {
-      transform: scale(0.95);
+    .action-button:not(.disabled):active {
+      transform: scale(0.95) !important;
+      -webkit-transform: scale(0.95) !important;
     }
-
+    
     .action-button.disabled {
       opacity: 0.5;
       transform: none;
@@ -316,16 +317,16 @@
     }
 
     .buy {
-  background: -webkit-linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
-  background: linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
-  transform: translateZ(0);
-}
+      background: -webkit-linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
+      background: linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
+      transform: translateZ(0);
+    }
 
-.sell {
-  background: -webkit-linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
-  background: linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
-  transform: translateZ(0);
-}
+    .sell {
+      background: -webkit-linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
+      background: linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
+      transform: translateZ(0);
+    }
 
 
     .disabled {
