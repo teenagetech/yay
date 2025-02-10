@@ -21,438 +21,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
     rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Rubik", sans-serif;
-    }
-
-    .action-button {
-      transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
-      -webkit-transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
-    }
-
-    .action-button:not(.disabled):active {
-      transform: scale(0.95) !important;
-      -webkit-transform: scale(0.95) !important;
-    }
-    
-    .action-button.disabled {
-      opacity: 0.5;
-      transform: none;
-      filter: none;
-    }
-
-    #accountBtn,
-    .close-modal-btn {
-      position: relative;
-      z-index: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    #accountBtn::after,
-    .close-modal-btn::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-
-    #accountBtn:hover::after,
-    .close-modal-btn:hover::after {
-      opacity: 1;
-    }
-
-    #accountBtn img,
-    .close-modal-btn img {
-      position: relative;
-      z-index: 1;
-    }
-
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: "Rubik", sans-serif !important;
-    }
-
-    .glass-container {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 32px;
-      width: 90%;
-      max-width: 600px;
-      text-align: center;
-      color: #fff;
-      margin-top: 30px;
-      margin-bottom: 30px;
-    }
-
-    #chartjs-tooltip {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 10px;
-      color: #fff;
-      min-width: 140px;
-      font-size: 14px;
-      position: absolute;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.1s ease, transform 0.1s ease;
-      transform: translate(-50%, -50%);
-      z-index: 100;
-    }
-
-    .account-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 7;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-
-    .account-modal.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .account-modal-content {
-      background: linear-gradient(135deg, rgba(0, 200, 255, 0.2), rgba(0, 115, 255, 0.2));
-      border-radius: 20px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 32px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      color: #fff;
-      transform: translateY(-20px);
-      transition: transform 0.5s ease;
-    }
-
-    .account-modal.visible .account-modal-content {
-      transform: translateY(0);
-    }
-
-    .account-modal h2 {
-      margin-bottom: 16px;
-      font-size: 28.8px;
-    }
-
-    .account-modal input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      margin: 8px 0;
-    }
-
-    .account-modal input[type="text"] {
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      transition: border-color 0.3s ease;
-    }
-
-    .account-modal input[type="text"]::placeholder {
-      color: #e0e0e0;
-    }
-
-    .account-modal input[type="text"]:hover,
-    .account-modal input[type="text"]:focus {
-      border-color: rgba(255, 255, 255, 0.7);
-      outline: none;
-    }
-
-    .account-modal input[type="text"]::after {
-      transition: border 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .account-modal .action-button {
-      border: none;
-      border-radius: 10px;
-      padding: 4px 16px;
-      font-size: 22px;
-      transition: filter 0.3s, opacity 0.3s;
-      margin: 0px 16px;
-      margin-top: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .account-modal input[type="text"]#currentUID {
-      padding-right: 56px;
-      border-radius: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      margin: 8px 0;
-      pointer-events: none;
-    }
-
-    .uid-field-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .uid-field-container input {
-      flex: 1;
-      padding-right: 60px;
-    }
-
-    .icon-buttons {
-      position: absolute;
-      right: 5px;
-      display: flex;
-      gap: 5px;
-    }
-
-    .icon-button {
-      border: none;
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      opacity: 0.8;
-      transition: opacity 0.3s;
-      background: none;
-      border-radius: 3px;
-      margin-top: 3px;
-    }
-
-    .icon-button:hover {
-      opacity: 1;
-    }
-
-    h1 {
-      margin-bottom: 16px;
-      font-size: 32px;
-    }
-
-    #price {
-      font-size: 40px;
-      margin-bottom: 16px;
-    }
-
-    #balance {
-      margin-bottom: 16px;
-    }
-
-    .action-button {
-      border: none;
-      border-radius: 10px;
-      padding: 12.8px 24px;
-      font-size: 19.2px;
-      color: #fff;
-      cursor: pointer;
-      transition: filter 0.3s, opacity 0.3s;
-      margin: 0 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      backdrop-filter: blur(5px);
-      font-family: "Rubik", sans-serif;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    #accountBtn {
-      position: absolute;
-      transition: border 0.3s;
-      top: -16px;
-      right: -16px;
-      width: 40px;
-      height: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    #accountBtn img {
-      width: 20px;
-      height: 20px;
-    }
-
-    #accountBtn:hover {
-      transition: border 0.3s;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .buy {
-      background: -webkit-linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
-      background: linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
-      transform: translateZ(0);
-    }
-
-    .sell {
-      background: -webkit-linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
-      background: linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
-      transform: translateZ(0);
-    }
-
-
-    .disabled {
-      opacity: 0.5;
-    }
-
-    .custom-alert {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 20px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 16px 32px;
-      z-index: 8;
-      text-align: center;
-      color: #fff;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      pointer-events: none;
-      cursor: default;
-    }
-
-    .custom-alert.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .custom-alert button {
-      margin-top: 16px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 5px;
-      background: rgba(255, 255, 255, 0.3);
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .custom-alert button:hover {
-      background-color: rgba(255, 255, 255, 0.4);
-      transition: background-color 0.1s ease-in-out;
-    }
-
-    .custom-alert button:active {
-      transform: scale(0.95);
-      transition: transform 0.1s ease-in-out;
-      transition: background-color 0.1s ease-in-out;
-    }
-
-    #chartContainer {
-      margin: 32px 0;
-    }
-
-    #priceChart {
-      width: 100% !important;
-      height: 300px !important;
-    }
-
-    .meaning-icon-sm {
-      vertical-align: middle;
-      width: 18px;
-      height: 18px;
-      margin-left: 3px;
-      margin-right: -5px;
-      filter: hue-rotate(120deg) invert(1)
-    }
-
-    .meaning-icon-lg {
-      vertical-align: middle;
-      width: 40px;
-      height: 40px;
-      margin-left: 3px;
-      margin-right: -10px;
-      filter: hue-rotate(120deg) invert(1)
-    }
-
-    .close-modal-btn {
-      position: absolute;
-      top: -16px;
-      right: -16px;
-      width: 40px;
-      height: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(0, 200, 255, 0.5), rgba(0, 115, 255, 0.5));
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .close-modal-btn img {
-      width: 20px;
-      height: 20px;
-    }
-
-    .close-modal-btn:hover {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    @media (max-width: 600px) {
-      .glass-container {
-        padding: 16px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      #price {
-        font-size: 32px;
-      }
-
-      #priceChart {
-        height: 200px !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body draggable="false" oncontextmenu="return false;">
@@ -473,16 +42,20 @@
       <button id="sellBtn" class="action-button sell">Sell</button>
     </div>
     <div id="chartContainer">
+
       <canvas id="priceChart"></canvas>
-    </div>
-    <div style="text-align: center; color: #fff; margin-bottom: 1rem;">
-      Active Users: <span id="activeUsersCount">0</span>
     </div>
     <button id="accountBtn">
       <img src="account.svg" alt="Account" draggable="false" oncontextmenu="return false;">
     </button>
+    <button id="licenseBtn" class="action-button">Earn <img src="meaning.svg" alt="Meaning Icon"
+        class="meaning-icon-earn" draggable="false" oncontextmenu="return false;">eaning</button>
   </div>
 
+  </div>
+  <div style="text-align: center; color: #fff; margin-bottom: 1rem;" class="activeCount">
+    Active Users: <span id="activeUsersCount">0</span>
+  </div>
   <div id="accountModal" class="account-modal">
     <div class="account-modal-content">
       <h2>Account Options</h2>
@@ -518,6 +91,16 @@
       <button id="closeAccountModalBtn" class="close-modal-btn">
         <img src="close.svg" alt="Close" width="20" height="20" draggable="false" oncontextmenu="return false;">
       </button>
+    </div>
+  </div>
+  <div id="licenseModal" class="license-modal">
+    <div class="license-modal-content">
+      <h2 class="agreement-title">License Agreement</h2>
+      <p id="licenseText"></p>
+      <div style="margin-top:16px;">
+        <button id="declineLicenseBtn" class="action-button">Decline</button>
+        <button id="acceptLicenseBtn" class="action-button">Agree</button>
+      </div>
     </div>
   </div>
 
@@ -556,6 +139,16 @@
     const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getDatabase(app);
+
+    let licenseAgreements = []
+
+    fetch('/licenseAgreements.json')
+      .then(response => response.json())
+      .then(data => {
+        licenseAgreements = data.agreements
+      })
+      .catch(error => console.error("Error loading license agreements:", error))
+
 
     let currentPrice = 100;
     let userBalance = 1000;
@@ -685,7 +278,7 @@
 
       const priceDiff = currentPrice - basePrice;
       const clampedDiff = Math.max(-30, Math.min(30, priceDiff));
-      const adjustment = (clampedDiff / 30) * 50; // value between -50 and +50
+      const adjustment = (clampedDiff / 30) * 50;
       let buySaturation, sellSaturation;
       if (priceDiff < 0) {
         buySaturation = 100 + Math.abs(adjustment);
@@ -726,7 +319,7 @@
     function updateUI() {
       document.getElementById("currentPrice").innerText = currentPrice.toFixed(2);
       document.getElementById("userBalance").innerText = userBalance.toFixed(2);
-      document.getElementById("userShares").innerText = Math.round(userShares); // Ensure shares are whole numbers
+      document.getElementById("userShares").innerText = Math.round(userShares);
       updateButtonSaturation();
       priceChart.options.scales.y.min = currentPrice - 7;
       priceChart.options.scales.y.max = currentPrice + 7;
@@ -813,7 +406,7 @@
 
     function buyShare() {
       if (userBalance < currentPrice) {
-        showAlert("You don't have enough", true, "eaning to buy a share.");
+        showAlert("You don't have enough", true, " to buy a share.");
         return;
       }
       const priceRef = ref(db, "yayPrice");
@@ -866,7 +459,10 @@
       if (showMeaning) {
         alertMessage.innerHTML =
           message +
-          '<img src="meaning.svg" alt="m" class="meaning-icon-sm" draggable="false"> ' +
+          '<span style="display:inline-flex; align-items:baseline;">' +
+          '<img src="meaning.svg" alt="m" draggable="false" style="position: relative; top: 4.7px; left: 1px; vertical-align: baseline; width: 1.08em; height: 1.08em; filter: hue-rotate(120deg) invert(1)">' +
+          'eaning' +
+          '</span>' +
           message2;
       } else {
         alertMessage.innerText = message;
@@ -874,6 +470,7 @@
       const alertEl = document.getElementById("customAlert");
       alertEl.classList.add("visible");
     }
+
 
     document.getElementById("alertCloseBtn").addEventListener("click", () => {
       document.getElementById("customAlert").classList.remove("visible");
@@ -991,6 +588,33 @@
 
     document.getElementById("accountBtn").addEventListener("click", showAccountModal);
     document.getElementById("closeAccountModalBtn").addEventListener("click", hideAccountModal);
+
+    function showLicenseModal() {
+      if (!licenseAgreements.length) {
+        console.error("License agreements not loaded yet")
+        return
+      }
+      const modal = document.getElementById("licenseModal")
+      document.getElementById("licenseText").innerText =
+        licenseAgreements[Math.floor(Math.random() * licenseAgreements.length)]
+      modal.classList.add("visible")
+    }
+
+
+    function hideLicenseModal() {
+      document.getElementById("licenseModal").classList.remove("visible")
+    }
+
+    document.getElementById("licenseBtn").addEventListener("click", showLicenseModal)
+    document.getElementById("declineLicenseBtn").addEventListener("click", hideLicenseModal)
+    document.getElementById("acceptLicenseBtn").addEventListener("click", () => {
+      const bonus = 100
+      userBalance += bonus
+      updateUserData()
+      updateUI()
+      hideLicenseModal()
+      showAlert(`Congrats, you earned ${bonus}`, true, "!")
+    });
 
   </script>
 </body>
