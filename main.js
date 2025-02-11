@@ -166,7 +166,7 @@ function updateButtonSaturation() {
 
   const priceDiff = currentPrice - basePrice;
   const clampedDiff = Math.max(-30, Math.min(30, priceDiff));
-  const adjustment = (clampedDiff / 30) * 50;
+  const adjustment = (clampedDiff / 30) * 450;
   let buySaturation, sellSaturation;
   if (priceDiff < 0) {
     buySaturation = 100 + Math.abs(adjustment);
@@ -306,10 +306,10 @@ function buyShare() {
       if (result.committed) {
         userBalance -= currentPrice;
         userShares += 1;
-        updateUserData();
         currentPrice = result.snapshot.val();
-        updateUI();
         logPriceHistory(currentPrice);
+        updateUserData();
+        updateUI();
       }
     })
     .catch((error) => {
@@ -331,10 +331,10 @@ function sellShare() {
       if (result.committed) {
         userBalance += currentPrice;
         userShares -= 1;
-        updateUserData();
         currentPrice = result.snapshot.val();
-        updateUI();
         logPriceHistory(currentPrice);
+        updateUserData();
+        updateUI();
       }
     })
     .catch((error) => {
