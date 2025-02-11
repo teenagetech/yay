@@ -6,9 +6,11 @@
 }
 
 .action-button {
+  background: transparent;
   transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
   -webkit-transition: transform 0.2s ease, filter 0.3s, opacity 0.3s;
 }
+
 
 .action-button:not(.disabled):active {
   transform: scale(0.95) !important;
@@ -30,8 +32,8 @@
   background: rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -202,6 +204,10 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+.account-modal .action-button:disabled {
+  pointer-events: none;
+}
+
 .account-modal input[type="text"]#currentUID {
   padding-right: 56px;
   border-radius: 5px;
@@ -240,7 +246,12 @@ body {
   transition: opacity 0.3s;
   background: none;
   border-radius: 3px;
-  margin-top: 3px;
+  background: linear-gradient(135deg, rgba(55, 172, 255, 0.557), rgba(33, 151, 235, 0.557));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon-button img {
+  padding-top: 2px
 }
 
 .icon-button:hover {
@@ -311,6 +322,7 @@ h1 {
   background: linear-gradient(135deg, rgb(0, 200, 177), rgb(0, 230, 230));
   transform: translateZ(0);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .sell {
@@ -318,6 +330,7 @@ h1 {
   background: linear-gradient(135deg, rgb(255, 150, 150), rgb(255, 130, 130));
   transform: translateZ(0);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .disabled {
@@ -368,6 +381,11 @@ h1 {
   transition: background-color 0.1s ease-in-out;
 }
 
+button.action-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .custom-alert button:active {
   transform: scale(0.95);
   transition: transform 0.1s ease-in-out;
@@ -384,10 +402,10 @@ h1 {
   height: 220px !important;
   border-radius: 20px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: transparent !important;
 }
+
 
 .meaning-ending {
   font-size: 16px;
@@ -484,6 +502,7 @@ h1 {
 
 #licenseBtn {
   margin-top: -12px;
+  background-color: #60aaff;
 }
 
 #declineLicenseBtn {
@@ -522,6 +541,10 @@ h1 {
 
   h1 {
     font-size: 24px;
+  }
+
+  .yayLogo {
+    width: 100px
   }
 
   #price {

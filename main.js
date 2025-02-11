@@ -107,7 +107,7 @@ const externalTooltipHandler = (context) => {
 };
 
 
-const ctx = document.getElementById("priceChart").getContext("2d");
+const ctx = document.getElementById('priceChart').getContext('2d', { alpha: true });
 let chartData = {
   labels: [],
   datasets: [
@@ -115,7 +115,7 @@ let chartData = {
       label: "value",
       data: [],
       fill: true,
-      borderColor: "#00ffff",
+      borderColor: "#0066ad",
       backgroundColor: "rgba(0, 255, 255, 0.1)",
       tension: 0.2,
       pointRadius: 2,
@@ -422,8 +422,9 @@ function login() {
         showAlert("That User ID doesn't exist. Try double-checking it.", false);
       } else {
         accountUID = pastedUID;
-        localStorage.setItem("accountUID", accountUID);
+        localStorage.setItem("accountUID", accountUID); // Now we have a custom user
         loadUserData();
+        updateLogoutButtonState(); // Now the logout button will be enabled
         hideAccountModal();
       }
     })
@@ -452,12 +453,25 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
     .then((cred) => {
       accountUID = cred.user.uid;
       loadUserData();
+      updateLogoutButtonState();
       hideAccountModal();
     })
     .catch((error) => {
       console.error("Sign out error:", error);
     });
 });
+
+function updateLogoutButtonState() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!localStorage.getItem("accountUID")) {
+    logoutBtn.disabled = true;
+    logoutBtn.classList.add("disabled");
+  } else {
+    logoutBtn.disabled = false;
+    logoutBtn.classList.remove("disabled");
+  }
+}
+
 
 function showAccountModal() {
   const modal = document.getElementById("accountModal");
@@ -467,11 +481,13 @@ function showAccountModal() {
   } else {
     document.getElementById("currentUID").value = "";
   }
+  updateLogoutButtonState();
 }
 
 function hideAccountModal() {
   const modal = document.getElementById("accountModal");
   modal.classList.remove("visible");
+  document.getElementById("loginUID").value = "";
 }
 
 document.getElementById("accountBtn").addEventListener("click", showAccountModal);
