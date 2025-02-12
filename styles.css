@@ -26,9 +26,9 @@
 .activeCount {
   font-size: 16px;
   padding: 5px;
-  bottom: 4px;
-  right: 8px;
-  position: absolute;
+  bottom: -4px;
+  right: 4px;
+  position: fixed;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -36,6 +36,7 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
+
 
 #accountBtn,
 .close-modal-btn {
@@ -502,7 +503,7 @@ button.action-button {
 
 #licenseBtn {
   margin-top: -12px;
-  background-color: #60aaff;
+  background-color: #3497f3;
 }
 
 #declineLicenseBtn {
